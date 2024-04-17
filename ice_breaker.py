@@ -9,39 +9,44 @@ from langfuse import Langfuse
 
 def fetch_all_pages(name=None, user_id=None, limit=50):
     page = 1
-    all_data = []
-
+    generations = []
+    observations = []
     while True:
         response = langfuse.get_generations(name=name, limit=limit, user_id=user_id, page=page)
+        new_res = langfuse.get_observations(name=name, limit=limit, user_id=user_id, page=page,type="OBSERVATION")
         if not response.data:
             break
 
-        all_data.extend(response.data)
+        generations.extend(response.data)
+        observations.extend(new_res.data)
         page += 1
 
-    return all_data
+    return generations,observations
 
 
 if __name__ == '__main__':
-    # Tests the SDK connection with the server
-    print(os.environ.get("LANGFUSE_PUBLIC_KEY"))
     langfuse_handler = CallbackHandler()
     langfuse_handler.auth_check()
     langfuse = Langfuse()
-    print(fetch_all_pages())
+
     print("Hello Langchain")
     summary_template = """
-    given information {information} about a person, I want you to create :
-    1. A short summary
-    2. Two interesting fact about them
-    3. Write a poem about them
+    You are an Data structures and algorithms expert AI bot. 
+    You will answer only these type of questions and decline to answer questions related to another domains.
+    You are helpful and wants to answer other question.
+    given question:  {question}  
     """
-    information = """
+    question = """
     Elon musk is CEO of Tesla. He also owns SpaceX.
     """
 
     summary_prompt_template = PromptTemplate(input_variables=["information"], template=summary_template)
-    llm = Ollama(model="llama2")
+    llm = Ollama(model="qwen:0.5b")
     chain = LLMChain(llm=llm, prompt=summary_prompt_template)
-    # res = chain.invoke({"information": information}, {"callbacks": [langfuse_handler]})
-    # print(res['text'])
+    while True:
+        question = input()
+        if question == "exit":
+            break
+        else:
+            res = chain.invoke({"question": question}, {"callbacks": [langfuse_handler]})
+            print(res['text'])
