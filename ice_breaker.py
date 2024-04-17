@@ -1,12 +1,15 @@
+import os
+
 from langchain.chains.llm import LLMChain
 from langchain_community.llms.ollama import Ollama
 from langchain_core.prompts import PromptTemplate
-# from langfuse.callback import CallbackHandler
+from langfuse.callback import CallbackHandler
 
 if __name__ == '__main__':
     # Tests the SDK connection with the server
-    # langfuse_handler = CallbackHandler()
-    # langfuse_handler.auth_check()
+    print(os.environ.get("LANGFUSE_PUBLIC_KEY"))
+    langfuse_handler = CallbackHandler()
+    langfuse_handler.auth_check()
     print("Hello Langchain")
     summary_template = """
     given information {information} about a person, I want you to create :
@@ -21,5 +24,5 @@ if __name__ == '__main__':
     summary_prompt_template = PromptTemplate(input_variables=["information"], template=summary_template)
     llm = Ollama(model="llama2")
     chain = LLMChain(llm=llm, prompt=summary_prompt_template)
-    res = chain.invoke({"information": information})
+    res = chain.invoke({"information": information}, {"callbacks": [langfuse_handler]})
     print(res['text'])
