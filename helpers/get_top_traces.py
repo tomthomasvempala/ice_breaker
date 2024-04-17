@@ -11,26 +11,23 @@ def get_connection():
             port=5432,
         )
     except:
-        print("Connection failed")
         return False
 
 
-conn = get_connection()
-if conn:
-    print("Connection to the PostgreSQL established successfully.")
-else:
-    print("Connection to the PostgreSQL encountered and error.")
+def get_top_traces(connection,limit):
+    if connection:
+        print("Connection to the PostgreSQL established successfully.")
+    else:
+        print("Connection to the PostgreSQL encountered and error.")
 
-curr = conn.cursor()
-# EXECUTE THE SQL QUERY
-curr.execute(" select * from traces where id in (SELECT trace_id FROM scores ORDER BY value desc LIMIT 10) ;")
-# FETCH ALL THE ROWS FROM THE CURSOR
-data = curr.fetchall()
-# PRINT THE RECORDS
-for row in data:
-    print(row)
-# CLOSE THE CONNECTION
-conn.close()
+    curr = connection.cursor()
+    curr.execute(f" SELECT * from traces where id in (SELECT trace_id FROM scores ORDER BY value desc LIMIT {limit}) ;")
+    return curr.fetchall()
 
-def get_top_traces():
-    return NotImplementedError
+
+if __name__ == "__main__":
+    connection = get_connection()
+    traces = get_top_traces(connection=connection,limit=2)
+    print(len(traces))
+    print(traces)
+    connection.close()
