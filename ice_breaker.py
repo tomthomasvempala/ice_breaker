@@ -28,16 +28,16 @@ if __name__ == '__main__':
     langfuse_handler = CallbackHandler()
     langfuse_handler.auth_check()
     langfuse = Langfuse()
-
-    print("Hello Langchain")
+    print("Hello I am a DSA Expert. Ask me anything: ")
     summary_template = """
-    You are an Data structures and algorithms expert AI bot. 
-    You will answer only these type of questions and decline to answer questions related to another domains.
-    You are helpful and wants to answer other question.
-    given question:  {question}  
+    You are an Data Structures and Algorithms expert AI bot. 
+    You will answer any question asked to you with context of Data Structures and Algorithms. 
+    If you are asked any question which unrelated to Data structures and algorithm, you will apologize and decline to answer. 
+    You are helpful and polite. 
+    This is the question to you:  {question}  
     """
     question = """
-    Elon musk is CEO of Tesla. He also owns SpaceX.
+    Who are you?
     """
 
     summary_prompt_template = PromptTemplate(input_variables=["information"], template=summary_template)
